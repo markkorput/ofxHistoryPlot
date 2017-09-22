@@ -334,3 +334,27 @@ float ofxHistoryPlot::getHigestValue(){
 string ofxHistoryPlot::getVariableName(){
     return varName;
 };
+
+std::shared_ptr<ofxHistoryPlot> ofxHistoryPlot::getVelocityCurve(unsigned int movingAverageBack, unsigned int movingAverageAhead){
+	auto velocityPlotRef = std::make_shared<ofxHistoryPlot>((float*)NULL, this->varName + " vel", this->MAX_HISTORY, false);
+	this->populateWithOurVelocityCurve(*velocityPlotRef, movingAverageBack, movingAverageAhead);
+	return velocityPlotRef;
+}
+
+void ofxHistoryPlot::populateWithOurVelocityCurve(ofxHistoryPlot& plot, unsigned int movingAverageBack, unsigned int movingAverageAhead){
+	movingAverageBack = std::max<int>(movingAverageBack, 1);
+	movingAverageAhead = std::max<int>(movingAverageAhead, 1);
+	unsigned int movingAverageSize = movingAverageBack + 1 + movingAverageAhead;
+
+	for(int i=0; i<this->values.size(); i++){ // TODO should there be an option to use this->smoothValues instead?
+		int j=-movingAverageBack;
+		float first = this->values[std::min<int>(this->values.size()-1, std::max<int>(0, i + j))];
+		float last = this->values[std::min<int>(this->values.size()-1, std::max<int>(0, i + j + movingAverageSize))];
+		float delta = last-first;
+		float vel = delta / (movingAverageSize-1);
+
+		// TODO; interrupt group when there's a peak in the curve
+
+		plot.update(vel);
+	}
+}

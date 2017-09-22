@@ -67,8 +67,11 @@ class ofxHistoryPlot{
 		void setCropToRect(bool s){scissor = s;}
 
 		std::deque<float>& getValues(){ return values; }
-    
+
         std::string getVariableName();
+
+		std::shared_ptr<ofxHistoryPlot> getVelocityCurve(unsigned int movingAverageBack=3, unsigned int movingAverageAhead=3);
+		void populateWithOurVelocityCurve(ofxHistoryPlot& plot, unsigned int movingAverageBack=3, unsigned int movingAverageAhead=3);
 
 	private:
 
